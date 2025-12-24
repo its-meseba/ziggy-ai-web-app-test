@@ -19,29 +19,8 @@ export interface AppConfig {
 // Server URL presets
 export const serverPresets = {
     local: 'ws://localhost:3001/user-audio-input',
-    server: 'wss://34.69.105.17:9200/user-audio-input',
+    server: 'ws://34.69.105.17:9200/user-audio-input',
 } as const;
-
-// Helper to get the correct WebSocket protocol based on page protocol
-export function getServerUrl(preset: 'local' | 'server'): string {
-    if (typeof window === 'undefined') {
-        return serverPresets[preset];
-    }
-
-    const isSecure = window.location.protocol === 'https:';
-
-    if (preset === 'local') {
-        // Local always uses ws:// (running on localhost)
-        return serverPresets.local;
-    }
-
-    // Server uses wss:// when page is on HTTPS, ws:// otherwise
-    if (isSecure) {
-        return serverPresets.server; // Already wss://
-    } else {
-        return serverPresets.server.replace('wss://', 'ws://');
-    }
-}
 
 export const defaultConfig: AppConfig = {
     serverUrl: 'ws://localhost:3001/user-audio-input',
