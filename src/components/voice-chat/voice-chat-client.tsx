@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { AppConfig, defaultConfig } from '@/config';
+import { useCallback, useState, useEffect } from 'react';
+import { AppConfig, defaultConfig, getServerUrl } from '@/config';
 import { ChatMessage, ServerMessage } from '@/types';
 import { useWebSocket, useAudioBuffer, useAudioRecorder } from '@/hooks';
 import {
@@ -15,6 +15,14 @@ export function VoiceChatClient() {
     // Configuration state
     const [config, setConfig] = useState<AppConfig>(defaultConfig);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+    // Set initial server URL based on page protocol (client-side only)
+    useEffect(() => {
+        setConfig(prev => ({
+            ...prev,
+            serverUrl: getServerUrl('local')
+        }));
+    }, []);
 
     // Update config
     const handleConfigChange = useCallback((updates: Partial<AppConfig>) => {

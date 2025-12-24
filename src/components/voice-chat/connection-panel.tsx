@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { AppConfig, serializerOptions, languageOptions, serverPresets } from '@/config';
+import { AppConfig, serializerOptions, languageOptions, serverPresets, getServerUrl } from '@/config';
 import { ConnectionStatus, AudioBufferState } from '@/types';
 
 interface ConnectionPanelProps {
@@ -22,6 +22,14 @@ interface ConnectionPanelProps {
     onConnect: () => void;
     onDisconnect: () => void;
     bufferState: AudioBufferState;
+}
+
+// Check if URL matches a preset (ignoring ws/wss difference)
+function isPresetActive(url: string, preset: 'local' | 'server'): boolean {
+    const presetUrl = serverPresets[preset];
+    const normalizedUrl = url.replace('wss://', 'ws://');
+    const normalizedPreset = presetUrl.replace('wss://', 'ws://');
+    return normalizedUrl === normalizedPreset;
 }
 
 export function ConnectionPanel({
@@ -57,18 +65,18 @@ export function ConnectionPanel({
                 {/* Server Preset Buttons */}
                 <div className="flex gap-2">
                     <Button
-                        variant={config.serverUrl === serverPresets.local ? 'default' : 'outline'}
+                        variant={isPresetActive(config.serverUrl, 'local') ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => onConfigChange({ serverUrl: serverPresets.local })}
+                        onClick={() => onConfigChange({ serverUrl: getServerUrl('local') })}
                         disabled={isConnected}
                         className="flex-1"
                     >
                         🏠 Local
                     </Button>
                     <Button
-                        variant={config.serverUrl === serverPresets.server ? 'default' : 'outline'}
+                        variant={isPresetActive(config.serverUrl, 'server') ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => onConfigChange({ serverUrl: serverPresets.server })}
+                        onClick={() => onConfigChange({ serverUrl: getServerUrl('server') })}
                         disabled={isConnected}
                         className="flex-1"
                     >
